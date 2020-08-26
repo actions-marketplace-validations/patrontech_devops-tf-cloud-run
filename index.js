@@ -42,24 +42,42 @@ async function main() {
 
         // Invoking Terraform Run API
         let runId = ''
-        const runResponse = await axios.post(terraformRunEndpoint, request, options)
+        await axios.post(terraformRunEndpoint, request, options)
             .then((response) => {
                 console.log("run/apply success:"+ JSON.stringify(response.data));
+                runId = response.data.data.id
             }, (error) => {
                 console.error("run error:"+JSON.stringify(error.response.data));
                 core.setFailed(error.message);
             });
-        runId = runResponse.data.data.id
+
         // Abort early if the startRun is set to false.
         if (startRun !== 'true'){
             core.setOutput("runId", runId);
         } else {
-            console.log("Attempting To Execute Run ID: "+runId);
+            const terraformGetRunDetailsEndpoint = "https://" + terraformHost + "/api/v2/runs/" + runId;
+            let checkRunStatus = true;
+            let checkCounter = 0
+            while (checkRunStatus === true){
+                const response = await axios.get(terraformGetRunDetailsEndpoint,options);
+                const runStatus = response.data.data.attributes.status;
+                if(runStatus === 'planned'){
+                    checkRunStatus = false;
+                }
+                console.log("DEBUG : Checking Job Status of Job: "+runId+" Status: "+runStatus)
+                await wait(10000);
+                checkCounter++;
+                if(checkCounter > 60){
+                    core.setFailed("Unable To Execute Terraform Plan - Most Likely Due To Queued Plans");
+                }
+            }
+            console.log("DEBUG : Attempting To Execute Run ID: "+runId);
             const terraformApplyRunEndpoint = "https://" + terraformHost + "/api/v2/runs/" + runId + "/actions/apply";
             // Invoking Terraform Run API
+
             const runApplyResponse = await axios.post(terraformApplyRunEndpoint, null, options)
                 .then((response) => {
-                    console.log('Apply Success!');
+                    console.log('DEBUG : Plan Apply Success!');
                     core.setOutput("runId", runId);
                 }, (error) => {
                     console.error("ERROR : Apply Error:" + JSON.stringify(error.response.data));
@@ -72,4 +90,10 @@ async function main() {
     }
 }
 
+// Little wait function so terraform cloud api isn't hammered with requests.
+async function wait(ms) {
+    return new Promise(resolve => {
+        setTimeout(resolve, ms);
+    });
+}
 main();
