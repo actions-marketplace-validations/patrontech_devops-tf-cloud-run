@@ -38,31 +38,32 @@ async function main() {
                     }
                 }
             }};
-        console.log("run request:" + JSON.stringify(request));
+        console.log("DEBUG : run request:" + JSON.stringify(request));
 
         // Invoking Terraform Run API
         let runId = ''
-        axios.post(terraformRunEndpoint, request, options)
+        const runResponse = await axios.post(terraformRunEndpoint, request, options)
             .then((response) => {
                 console.log("run/apply success:"+ JSON.stringify(response.data));
-                runId = response.data.data.id
             }, (error) => {
                 console.error("run error:"+JSON.stringify(error.response.data));
                 core.setFailed(error.message);
             });
+        runId = runResponse.data.data.id
         // Abort early if the startRun is set to false.
         if (startRun !== 'true'){
-            core.setOutput("runId", response.data.data.id);
+            core.setOutput("runId", runId);
         } else {
+            console.log("Attempting To Execute Run ID: "+runId);
             const terraformApplyRunEndpoint = "https://" + terraformHost + "/api/v2/runs/" + runId + "/actions/apply";
             // Invoking Terraform Run API
-            axios.post(terraformApplyRunEndpoint, null, options)
+            const runApplyResponse = await axios.post(terraformApplyRunEndpoint, null, options)
                 .then((response) => {
                     console.log('Apply Success!');
                     core.setOutput("runId", runId);
                 }, (error) => {
-                    console.error("apply error:" + JSON.stringify(error.response.data));
-                    core.setFailed(error.message+"- It's likely this is being blocked by another plan.");
+                    console.error("ERROR : Apply Error:" + JSON.stringify(error.response.data));
+                    core.setFailed(error.message+" - It's likely this is being blocked by another plan.");
                 });
         }
 
