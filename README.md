@@ -25,7 +25,11 @@ https://www.terraform.io/docs/cloud/api/run.html
 
 **Required** Specifies if this plan is a destroy plan, which will destroy all provisioned resources.
 
- ### `message`
+### `startRun`
+
+**Required** Specifies if the run/plan should be executed.
+
+### `message`
 
 **Required** Specifies the message to be associated with this run.
 
@@ -38,13 +42,14 @@ https://www.terraform.io/docs/cloud/api/run.html
 ## Example usage
 
 ```
-uses: sarathkrish/invoke-terraform-run-api@v1.0   
+uses: patrontech/devops-tf-cloud-run@v1.0.0   
 with:  
   workSpaceName: MyTestWorkspace  
   organizationName: {{env.organization}}  
   terraformToken: {{secrets.Terraform_Token}}
   terraformHost: 'app.terraform.io'
   isDestroy: false
+  startRun: false
   message: 'GitHub Actions'
 
 ```

@@ -19,6 +19,9 @@ inputs:
   message:
     description: 'Specifies the message to be associated with this run.'
     required: true
+  startRun:
+    description: 'Specifies if the run should be started'
+    required: true
 outputs:
   runId: 
     description: 'The run ID'
