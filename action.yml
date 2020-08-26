@@ -1,4 +1,4 @@
-name: 'Run Terraform'
+name: 'Run Terraform Plan'
 description: 'Invoke Terraform API to run Terraform'
 inputs:
   workSpaceName:
