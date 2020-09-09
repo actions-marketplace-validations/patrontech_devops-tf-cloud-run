@@ -69,6 +69,8 @@ async function main() {
                 checkCounter++;
                 if(checkCounter > 60){
                     core.setFailed("Unable To Execute Terraform Plan - Most Likely Due To Queued Plans");
+                    throw ("Unable To Execute Terraform Plan - Most Likely Due To Queued Plans (1)");
+                    process.exit(1);
                 }
             }
             console.log("DEBUG : Attempting To Execute Run ID: "+runId);
@@ -82,11 +84,14 @@ async function main() {
                 }, (error) => {
                     console.error("ERROR : Apply Error:" + JSON.stringify(error.response.data));
                     core.setFailed(error.message+" - It's likely this is being blocked by another plan.");
+                    throw ("Apply Error - It's likely this is being blocked by another plan.")
+                    process.exit(1)
                 });
         }
 
     } catch(error){
         core.setFailed(error.message);
+        process.exit(1)
     }
 }
 
