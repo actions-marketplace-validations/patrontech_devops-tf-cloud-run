@@ -64,6 +64,9 @@ async function main() {
                 if(runStatus === 'planned'){
                     checkRunStatus = false;
                 }
+                if(runStatus === 'errored'){
+                    throw ("Error with Plan - Aborting Run");
+                }
                 console.log("DEBUG : Checking Job Status of Job: "+runId+" Status: "+runStatus)
                 await wait(10000);
                 checkCounter++;
