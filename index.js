@@ -84,8 +84,8 @@ async function main() {
                 }, (error) => {
                     console.error("ERROR : Apply Error:" + JSON.stringify(error.response.data));
                     core.setFailed(error.message+" - It's likely this is being blocked by another plan.");
-                    throw ("Apply Error - It's likely this is being blocked by another plan.")
-                    process.exit(1)
+                    throw ("Apply Error - It's likely this is being blocked by another plan.");
+                    process.exit(1);
                 });
         }
 
