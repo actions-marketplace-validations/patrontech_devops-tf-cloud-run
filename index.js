@@ -61,7 +61,7 @@ async function main() {
             while (checkRunStatus === true){
                 const response = await axios.get(terraformGetRunDetailsEndpoint,options);
                 const runStatus = response.data.data.attributes.status;
-                if(runStatus === 'planned'){
+                if(runStatus === 'planned' || runStatus === 'planned_and_finished'){
                     checkRunStatus = false;
                 }
                 if(runStatus === 'errored'){
